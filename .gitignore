@@ -1,0 +1,8 @@
+.vscode/
+.idea/
+[Bb]uild*/
+.DS_Store
+*.obj
+*.dll
+*.so
+script_syntax_check*

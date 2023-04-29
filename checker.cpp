@@ -186,14 +186,17 @@ int main(int argc, char* argv[]) {
 		if(auto code = tryParseCode(name); code.has_value() && !mustNotParseAsCard(code.value())) {
 			auto script = scripts.find(code.value());
 			if(script == scripts.end()) {
-				if(code.value() != 0)
+				if(code.value() != 0) {
+					fprintf(stderr, "Failed to open c%d.lua, while parsing c%d.lua\n", code.value(), loading_card);
 					status_code = EXIT_FAILURE;
+				}
 				return 0;
 			}
 			script_path = script->second;
 		} else {
 			auto script = non_card_scripts.find(name);
 			if(script == non_card_scripts.end()) {
+				fprintf(stderr, "Failed to open %s, while parsing c%d.lua\n", name, loading_card);
 				status_code = EXIT_FAILURE;
 				return 0;
 			}

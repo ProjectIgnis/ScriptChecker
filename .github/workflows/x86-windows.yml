@@ -11,7 +11,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       with:
           arch: win32
-    - name: Meson Build
+    - name: Build
       shell: cmd
       run: |
         build

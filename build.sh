@@ -4,4 +4,8 @@ DL="-ldl"
 if [ -n "${NODL+1}" ]; then
 	DL=""
 fi
-$CXX checker.cpp -std=c++17 -fexceptions $DL -lstdc++fs -Wpedantic -Wextra -Werror -O3 -static-libgcc -static-libstdc++ -o script_syntax_check
+GCC_LIBS=" -lstdc++fs -static-libgcc -static-libstdc++"
+if [ -n "${MACOS+1}" ]; then
+	GCC_LIBS=""
+fi
+$CXX checker.cpp -std=c++17 -fexceptions $DL -Wpedantic -Wextra -Werror -O3 $GCC_LIBS -o script_syntax_check

@@ -1,0 +1,23 @@
+name: x64-linux
+on: push
+jobs:
+  x64-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Build
+      run: |
+        ./build.sh
+    - name: Setup directory with artifacts
+      shell: bash
+      run: |
+        export RDIR=ScriptChecker
+        mkdir $RDIR
+        cp script_syntax_check $RDIR/
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ScriptChecker
+        path: ScriptChecker/

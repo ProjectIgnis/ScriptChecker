@@ -1,0 +1,28 @@
+name: x86-windows
+on: push
+jobs:
+  x86-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Set x86 windows build tools as default
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+          arch: win32
+    - name: Meson Build
+      shell: cmd
+      run: |
+        build
+    - name: Setup directory with artifacts
+      shell: bash
+      run: |
+        export RDIR=ScriptChecker
+        mkdir $RDIR
+        cp script_syntax_check.exe $RDIR/
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ScriptChecker
+        path: ScriptChecker/

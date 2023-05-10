@@ -153,6 +153,7 @@ int main(int argc, char* argv[]) {
 			parseScriptFolder(argv[i]);
 		}
 	}
+	fflush(stdout);
 	auto utility = non_card_scripts.find("utility.lua");
 	auto constant = non_card_scripts.find("constant.lua");
 	if(utility == non_card_scripts.end() || constant == non_card_scripts.end())

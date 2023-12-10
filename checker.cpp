@@ -4,10 +4,23 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #define CORENAME "ocgcore.dll"
-#define LoadCore() LoadLibrary("./ocgcore.dll")
+auto LoadCore() {
+	auto previous = SetErrorMode(SEM_FAILCRITICALERRORS);
+	auto handle = LoadLibrary("./ocgcore.dll");
+	SetErrorMode(previous);
+	return handle;
+}
 #define CloseLibrary(lib) FreeLibrary(lib)
 #define GetFunction(lib, funcname) GetProcAddress(lib, funcname)
 using core_t = HMODULE;
+const char* GetDllError() {
+	static char error_buffer[65535];
+	error_buffer[0] = '\0';
+	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, GetLastError(),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        error_buffer, static_cast<DWORD>(sizeof(error_buffer)), nullptr);
+	return error_buffer;
+}
 #else
 #include <dlfcn.h>
 #ifdef __linux__
@@ -18,6 +31,7 @@ using core_t = HMODULE;
 #define LoadCore() dlopen(CORENAME, RTLD_NOW)
 #define CloseLibrary(lib) dlclose(lib)
 #define GetFunction(lib, funcname) dlsym(lib, funcname)
+#define GetDllError() dlerror()
 using core_t = void*;
 #endif
 #ifdef _MSC_VER
@@ -161,7 +175,7 @@ int main(int argc, char* argv[]) {
 
 	std::unique_ptr<std::remove_pointer_t<core_t>, void(*)(core_t)> core{ LoadCore(), [](core_t library) { CloseLibrary(library); } };
 	if(core == nullptr)
-		Error("Failed to load the core\n");
+		Error("Failed to load the core: %s\n", GetDllError());
 
 	OCG_GetVersion = function_cast<OCG_GetVersion_t>(GetFunction(core.get(), "OCG_GetVersion"));
 	OCG_CreateDuel = function_cast<OCG_CreateDuel_t>(GetFunction(core.get(), "OCG_CreateDuel"));

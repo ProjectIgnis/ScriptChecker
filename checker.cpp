@@ -1,4 +1,4 @@
-//  SPDX-FileCopyrightText: 2023 Edoardo Lolletti <edoardo762@gmail.com>
+//  SPDX-FileCopyrightText: 2023-2025 Edoardo Lolletti <edoardo762@gmail.com>
 //  SPDX-License-Identifier: MIT
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -94,11 +94,11 @@ uint32_t loading_card = 0;
 std::map<uint32_t, fs::path> scripts;
 std::map<std::string, fs::path> non_card_scripts;
 
-using OCG_CreateDuel_t = int(*)(OCG_Duel* duel, OCG_DuelOptions options);
+using OCG_CreateDuel_t = int(*)(OCG_Duel* duel, const OCG_DuelOptions* options);
 OCG_CreateDuel_t OCG_CreateDuel{nullptr};
 using OCG_DestroyDuel_t = void(*)(OCG_Duel duel);
 OCG_DestroyDuel_t OCG_DestroyDuel{nullptr};
-using OCG_DuelNewCard_t = void(*)(OCG_Duel duel, OCG_NewCardInfo info);
+using OCG_DuelNewCard_t = void(*)(OCG_Duel duel, const OCG_NewCardInfo* info);
 OCG_DuelNewCard_t OCG_DuelNewCard{nullptr};
 using OCG_LoadScript_t = int(*)(OCG_Duel duel, const char* buffer, uint32_t length, const char* name);
 OCG_LoadScript_t OCG_LoadScript{nullptr};
@@ -159,7 +159,7 @@ void parseScriptFolder(const char* path) {
 
 int main(int argc, char* argv[]) {
 	if(argc == 1) {
-		printf("No foler passed, using the current directory\n");
+		printf("No folder passed, using the current directory\n");
 		parseScriptFolder(".");
 	} else {
 		for(int i = 1; i < argc; ++i) {
@@ -223,7 +223,7 @@ int main(int argc, char* argv[]) {
 		status_code = EXIT_FAILURE;
 		fprintf(stderr, "%s: %s, while parsing c%d.lua\n", getLogLevelString(static_cast<OCG_LogTypes>(type)), string, loading_card);
 	};
-	if(OCG_CreateDuel(&pduel, opts) != OCG_DUEL_CREATION_SUCCESS) {
+	if(OCG_CreateDuel(&pduel, &opts) != OCG_DUEL_CREATION_SUCCESS) {
 		OCG_DestroyDuel(pduel);
 		Error("Failed to create duel instance!\n");
 	}
@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
 	card.pos = POS_FACEDOWN;
 	for(const auto& [code, path] : scripts) {
 		card.code = loading_card = code;
-		OCG_DuelNewCard(pduel, card);
+		OCG_DuelNewCard(pduel, &card);
 	}
 
 	OCG_DestroyDuel(pduel);

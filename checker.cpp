@@ -193,6 +193,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	OCG_DuelOptions opts{};
+	opts.seed[0] = 1;
 	opts.cardReader = []([[maybe_unused]] void* payload, uint32_t code, OCG_CardData* data) {
 		data->code = code;
 	};

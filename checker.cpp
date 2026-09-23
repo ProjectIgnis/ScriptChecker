@@ -233,6 +233,8 @@ int main(int argc, char* argv[]) {
 		Error("Failed to load constant.lua\n");
 	if(!loadScript(utility->second))
 		Error("Failed to load utility.lua\n");
+	if(fs::exists("init.lua") && !loadScript("init.lua"))
+		Error("Failed to load init.lua\n");
 
 	OCG_NewCardInfo card{};
 	card.team = card.duelist = card.con = 0;
